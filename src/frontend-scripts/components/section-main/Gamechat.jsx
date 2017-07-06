@@ -1,18 +1,10 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import $ from 'jquery';
 import {PLAYERCOLORS, MODERATORS} from '../../constants';
-import { loadReplay } from '../../actions/actions';
-import classnames from 'classnames';
-
 
 var chatScroll =0;
 
-const mapDispatchToProps = dispatch => ({
-	loadReplay: summary => dispatch(loadReplay(summary))
-});
-
-class Gamechat extends React.Component {
+export default class Gamechat extends React.Component {
 	constructor() {
 		super();
 		this.handleChatFilterClick = this.handleChatFilterClick.bind(this);
@@ -27,12 +19,12 @@ class Gamechat extends React.Component {
 
 		this.state = {
 			chatFilter: 'All',
-			lock: true,
+			lock: false,
 			inputValue: '',
 			claim: '',
 			badKarma: '',
 			playersToWhitelist: [],
-			disabled: false
+			disabled: false,
 		};
 	}
 
@@ -42,6 +34,10 @@ class Gamechat extends React.Component {
 			this.props.onLeaveGame(this.props.userInfo.isSeated, false, this.state.badKarma);
 			$(this.leaveGameModal).modal('hide');
 		});
+	}
+
+	handleScroll(e){
+		chatScroll= e.currentTarget.scrollTop;
 	}
 
 	componentDidUpdate(prevProps) {
@@ -54,10 +50,6 @@ class Gamechat extends React.Component {
 			this.setState({inputValue: ''});
 			$(this.gameChatInput).blur();
 		}
-	}
-
-	handleScroll(e){
-		chatScroll= e.currentTarget.scrollTop;
 	}
 
 	handleBadKarmaCheck(playerName) {
@@ -91,18 +83,15 @@ class Gamechat extends React.Component {
 	handleSubmit(e) {
 		const currentValue = this.state.inputValue,
 			{gameInfo, userInfo} = this.props;
-
 		e.preventDefault();
-
 		if (currentValue.length) {
 			const chat = {
 				userName: userInfo.userName,
 				chat: currentValue,
 				gameChat: false,
 				uid: gameInfo.general.uid,
-				inProgress: gameInfo.gameState.isStarted
+				inProgress: gameInfo.gameState.isStarted ||false
 			};
-
 			this.props.socket.emit('addNewGameChat', chat);
 			this.setState({
 				inputValue: '',
@@ -110,6 +99,7 @@ class Gamechat extends React.Component {
 			});
 			this.gameChatInput.blur();
 			setTimeout(() => {
+				document.getElementById('chatDiv').scrollTop = 99999999;
 				this.setState({disabled: false});
 				this.gameChatInput.focus();
 			}, 150);
@@ -117,16 +107,10 @@ class Gamechat extends React.Component {
 	}
 
 	scrollChats() {
-		if (!this.state.lock) {
-			document.querySelector('section.segment.chats > .ui.list').scrollTop = 99999999;
-		}else{
-			var viewTop=document.getElementById('chatContainer').offsetHeight - document.getElementById('chatDiv').offsetHeight
-			if ((viewTop-chatScroll)<40 ) {
-				document.getElementById('chatDiv').scrollTop = 99999999;
-			}
+		var viewTop=document.getElementById('chatContainer').offsetHeight - document.getElementById('chatDiv').offsetHeight
+		if ((viewTop-chatScroll)<40 ) {
+			document.getElementById('chatDiv').scrollTop = 99999999;
 		}
-
-
 	}
 
 	handleChatFilterClick(e) {
@@ -145,6 +129,7 @@ class Gamechat extends React.Component {
 	}
 
 	handleChatLockClick() {
+		console.log(this.state);
 		if (this.state.lock) {
 			this.setState({lock: false});
 		} else {
@@ -257,85 +242,46 @@ class Gamechat extends React.Component {
 					whitelistPlayers
 				});
 				$(this.whitelistModal).modal('hide');
-			},
-			MenuButton = ({ children }) => (
-				<div className="item">{children}</div>
-			),
-			WhiteListButton = () => {
-				if (userInfo.isSeated && gameInfo.general.private && !gameInfo.gameState.isStarted) {
-					return (
-						<MenuButton>
-							<div
-								className="ui button whitelist"
-								onClick={this.handleWhitelistPlayers}>
-								Whitelist Players
-							</div>
-						</MenuButton>
-					);
-				} else {
-					return null;
-				}
-			},
-			WatchReplayButton = () => {
-				const { summary } = gameInfo;
-
-				if (summary) {
-					const onClick = () => {
-						this.props.loadReplay(summary, true);
-						this.props.onLeaveGame(this.props.userInfo.isSeated, false, this.state.badKarma, true);
-					};
-
-					return (
-						<MenuButton>
-							<div
-								className="ui primary button"
-								onClick={onClick}>
-								Watch Replay
-							</div>
-						</MenuButton>
-					);
-				} else return null;
-			},
-			LeaveGameButton = () => {
-				const classes = classnames('ui primary button', {
-					['ui-disabled']: userInfo.isSeated && gameInfo.gameState.isStarted && !gameInfo.gameState.isCompleted
-				});
-
-				return (
-					<MenuButton>
-						<div
-							className={classes}
-							onClick={this.handleClickedLeaveGame}>
-							Leave Game
-						</div>
-					</MenuButton>
-				);
 			};
 
 		return (
+			
 			<section className="gamechat">
+				
 				<section className="ui pointing menu">
 					<a className={this.state.chatFilter === 'All' ? 'item active' : 'item'} onClick={this.handleChatFilterClick}>All</a>
 					<a className={this.state.chatFilter === 'Chat' ? 'item active' : 'item'} onClick={this.handleChatFilterClick}>Chat</a>
 					<a className={this.state.chatFilter === 'Game' ? 'item active' : 'item'} onClick={this.handleChatFilterClick}>Game</a>
 					<a className={this.state.chatFilter === 'No observer chat' ? 'item active' : 'item'} onClick={this.handleChatFilterClick}>No observer chat</a>
 					<i className={this.state.lock ? 'large lock icon' : 'large unlock alternate icon'} onClick={this.handleChatLockClick} />
-					<div className="right menu">
-						<WhiteListButton />
-						<WatchReplayButton />
-						<LeaveGameButton />
-					</div>
+					{(() => {
+						if (userInfo.isSeated && gameInfo.general.private && !gameInfo.gameState.isStarted) {
+							return <div className='ui button whitelist' onClick={this.handleWhitelistPlayers}>Whitelist Players</div>;
+						}
+					})()}
+					<div className={
+						(() => {
+							let classes = 'ui primary button';
+
+							if (userInfo.isSeated && (gameInfo.gameState.isStarted && !gameInfo.gameState.isCompleted)) {
+								classes += ' ui-disabled';
+							}
+
+							return classes;
+						})()
+					} onClick={this.handleClickedLeaveGame}>Leave Game</div>
 				</section>
+				
 				<section style={{fontSize: (userInfo.gameSettings && userInfo.gameSettings.fontSize) ? `${userInfo.gameSettings.fontSize}px` : '18px'}} className={
 					(() => {
 						let classes = 'segment chats';
-
-						if (this.state.claim) {
+ 
+						if (this.state.claim  || this.props.gameInfo.cardFlingerState.length) {
 							classes += ' blurred';
 						}
 
 						return classes;
-					})() 
+					})()
 				}>
 					<div className="ui list" id="chatDiv"  onScroll={this.handleScroll.bind(this)}>
 						<div id="chatContainer">
@@ -496,10 +442,10 @@ class Gamechat extends React.Component {
 						<input value={this.state.inputValue} autoComplete="off" spellCheck="false" placeholder="Chat.." id="gameChatInput" ref={c => {
 							this.gameChatInput = c;
 						}} onChange={this.handleInputChange} maxLength="300" />
-						<button className={this.state.inputValue.length ? 'ui primary button' : 'ui primary button disabled'}>Chat</button>
+						<button onClick={this.handleSubmit} className={this.state.inputValue.length ? 'ui primary button' : 'ui primary button disabled'}>Chat</button>
 					</div>
 					{(() => {
-						if (gameInfo.playersState && gameInfo.playersState.length && userInfo.userName && gameInfo.playersState[gameInfo.publicPlayersState.findIndex(player => player.userName === userInfo.userName)].claim) {
+						if (gameInfo.playersState.length && userInfo.userName && gameInfo.playersState[gameInfo.publicPlayersState.findIndex(player => player.userName === userInfo.userName)].claim) {
 							return <div className="claim-button" title="Click here to make a claim in chat" onClick={this.handleClickedClaimButton}>C</div>;
 						}
 					})()}
@@ -550,8 +496,3 @@ Gamechat.propTypes = {
 	socket: React.PropTypes.object,
 	userList: React.PropTypes.object
 };
-
-export default connect(
-	null,
-	mapDispatchToProps
-)(Gamechat);

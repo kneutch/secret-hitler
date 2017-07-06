@@ -1,0 +1,57 @@
+.creategame {
+	padding: 2%;
+
+	.remove.icon {
+		cursor: pointer;
+		position: absolute;
+		font-size: 30px;
+		left: 760px;
+		opacity: .3;
+	}
+
+	.contains-bad-word {
+		color: red;
+	}
+
+	> .header {
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	.grid h4 {
+		margin-bottom: 5px;
+	}
+
+	.grid > div {
+		text-align: center;
+	}
+
+	.sliderrow .ui.header {
+		min-height: 80px;
+	}
+
+	.gamename {
+		h4 small {
+			margin-left: 8px;
+		}
+
+		input {
+			width: 80%;
+		}
+
+	}
+
+	.private {
+		.checkbox {
+			width: 55px;
+			margin: 0 auto;
+			display: block;
+		}
+	}
+
+	.ui.dropdown {
+		box-shadow: 0 0 0 1px rgba(34,36,38,.15) inset;
+		padding: 8px 7px 9px 8px;
+		border-radius: .28571429rem;
+	}
+}

@@ -2,8 +2,6 @@ const passport = require('passport'),
 	_ = require('lodash'),
 	Account = require('../models/account'),
 	BannedIP = require('../models/BannedIP'),
-	// verifyAccount = require('./verify-account'),
-	// resetPassword = require('./reset-password'),
 	blacklistedWords = require('../iso/blacklistwords'),
 	ensureAuthenticated = (req, res, next) => {
 		if (req.isAuthenticated()) {
@@ -12,10 +10,7 @@ const passport = require('passport'),
 
 		res.redirect('/');
 	};
-
 module.exports = () => {
-	// verifyAccount.setRoutes();
-	// resetPassword.setRoutes();
 
 	app.get('/account', ensureAuthenticated, (req, res) => {
 		res.render('page-account', {
@@ -24,6 +19,49 @@ module.exports = () => {
 			email: req.user.verification.email
 		});
 	});
+
+app.get('/auth/twitter', passport.authenticate('twitter'));
+	app.get('/auth/twitter/callback',
+		passport.authenticate('twitter', { failureRedirect: '/observe' }),
+		function (req, res) {
+			console.log(req);
+			res.redirect('/game');
+		});
+
+
+	app.get('/auth/reddit', function(req, res, next){
+  		passport.authenticate('reddit', {
+    		state: "stopsnitchin",
+    		duration: 'permanent',
+  		})(req, res, next);
+	});
+
+
+	app.get('/auth/reddit/callback', function(req, res, next){
+  	// Check for origin via state token 
+		passport.authenticate('reddit', {
+   			successRedirect: '/game',
+   			failureRedirect: '/observe'
+		})(req, res, next);
+	});
+	
+
+	app.get('/auth/tumblr', passport.authenticate('tumblr'));
+	app.get('/auth/tumblr/callback',
+		passport.authenticate('tumblr', { failureRedirect: '/observe' }),
+		function (req, res) {
+			res.redirect('/game');
+		});
+
+	app.get('/auth/google', passport.authenticate('google', { scope: ['openid',  'email' , 'profile'] }));
+	app.get('/auth/google/callback',
+		passport.authenticate('google', { failureRedirect: '/observe' }),
+		function (req, res) {
+			res.redirect('/game');
+		});
+
+
+
 
 	app.post('/account/change-password', ensureAuthenticated, (req, res) => {
 		const {newPassword, newPasswordConfirm} = req.body,

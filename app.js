@@ -10,7 +10,13 @@ const fs = require('fs'),
 	passport = require('passport'),
 	mongoose = require('mongoose'),
 	compression = require('compression'),
+	config = require('./auth/_conf'),
+	auth = require('./auth/init'),
 	Strategy = require('passport-local').Strategy,
+	RedditStrategy = require('passport-reddit').Strategy,
+	TwitterStrategy = require('passport-twitter').Strategy,
+	TumblrStrategy = require('passport-tumblr').Strategy,
+	GoogleStrategy = require('passport-google-oauth20').Strategy,
 	Account = require('./models/account'),
 	routesIndex = require('./routes/index'),
 	session = require('express-session')({
@@ -39,6 +45,44 @@ io.use(socketSession(session, {
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new Strategy(Account.authenticate()));
+
+
+passport.use(new TumblrStrategy({
+  	consumerKey: config.tumblr.clientID,
+  	consumerSecret: config.tumblr.clientSecret,
+  	callbackURL: config.tumblr.callbackURL
+	},
+  	function (token, tokenSecret, profile, done) { auth.authTumblr(token, tokenSecret, profile, done);}
+));
+
+passport.use(new TwitterStrategy({
+    consumerKey: config.twitter.consumerKey,
+    consumerSecret: config.twitter.consumerSecret,
+    callbackURL: config.twitter.callbackURL
+  },
+   	function (token, tokenSecret, profile, done) {auth.authTwitter(token, tokenSecret, profile, done);}
+));
+
+passport.use(new GoogleStrategy({
+    clientID: config.google.clientID,
+    clientSecret: config.google.clientSecret,
+    callbackURL:  config.google.callbackURL
+  },
+  function(accessToken, refreshToken, profile, done) {auth.authGoogle(token, tokenSecret, profile, done);}
+));
+
+passport.use(new RedditStrategy({
+    clientID: config.reddit.clientID,
+    clientSecret: config.reddit.clientSecret,
+    callbackURL: config.reddit.callbackURL
+  },
+  function(accessToken, refreshToken, profile, done) {auth.authReddit(token, tokenSecret, profile, done);}
+));
+
+
+  
+
+
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 mongoose.connect('mongodb://localhost/secret-hitler-app'); // local

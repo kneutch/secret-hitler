@@ -8,43 +8,27 @@ import Profile from './Profile.jsx';
 import Replay from './replay/Replay.jsx';
 import Changelog from './Changelog.jsx';
 import Moderation from './Moderation.jsx';
+import Home from './Home.jsx'; 
+import Lobby from './Lobby.jsx';
+import LeftSidebar from './LeftSidebar.jsx';
 
 export default class Main extends React.Component {
+
+	handleCreateGameSubmit(game) {
+		const {dispatch, userInfo} = this.props;
+
+		userInfo.isSeated = true;
+		dispatch(updateUser(userInfo));
+		dispatch(updateMidsection('game'));
+		dispatch(updateGameInfo(game));
+		socket.emit('addNewGame', game);
+	}
+
 	render() {
 		return (
-			<section
-				className={
-					(() => {
-						let classes = '';
-
-						if (this.props.midSection === 'game' || this.props.midSection === 'replay') {
-							if (this.props.gameInfo.general && this.props.gameInfo.general.experiencedMode) {
-								classes = 'experienced ';
-							}
-
-							if (this.props.userInfo.gameSettings && this.props.userInfo.gameSettings.enableRightSidebarInGame) {
-								classes += 'thirteen';
-							} else {
-								classes += 'sixteen';
-							}
-						} else if (this.props.midSection === 'replay') {
-							classes += 'sixteen';
-						} else {
-							classes = 'ten';
-						}
-
-						classes += ' wide column section-main';  // yes semantic requires classes in specific order... ascii shrug
-						return classes;
-					})()
-				}
-			>
-				<Menu
-					userInfo={this.props.userInfo}
-					onLeaveGame={this.props.onLeaveGame}
-					onSettingsButtonClick={this.props.onSettingsButtonClick}
-					gameInfo={this.props.gameInfo}
-				/>
+			<section>
 				{(() => {
+					const { gameInfo, userInfo } = this.props;
 					switch (this.props.midSection) {
 					case 'createGame':
 						return (
@@ -60,6 +44,17 @@ export default class Main extends React.Component {
 							<Changelog
 								onLeaveChangelog={this.props.onLeaveChangelog}
 								version={this.props.version}
+							/>
+						);
+					case 'lobby':	
+						return (
+							<Lobby
+								gameInfo={this.props.gameInfo}
+								userInfo={this.props.userInfo}
+								userList={this.props.userList}
+								generalChats={this.props.generalChats}
+								onModerationButtonClick={this.handleRoute}
+								socket={this.props.socket}
 							/>
 						);
 					case 'game':
@@ -96,14 +91,39 @@ export default class Main extends React.Component {
 								socket={this.props.socket}
 							/>
 						);
+					case 'home':	
+						return (
+							<LeftSidebar
+								userInfo={this.props.userInfo}
+								midSection={this.props.midSection}
+								gameList={this.props.gameList}
+								onCreateGameButtonClick={this.props.onCreateGameButtonClick}
+								onGameClick={this.handleGameClick}
+								socket={this.props.socket}
+							/>
+						);
 					case 'profile':
 						return <Profile />;
 					case 'replay':
 						return <Replay />;
 					default:
-						return (
-							<Defaultmid quickDefault={this.props.quickDefault} />
-						);
+						return !userInfo.userName ? 
+							<Home
+								userInfo={this.props.userInfo}
+								midSection={this.props.midSection}
+								gameList={this.props.gameList}
+								onCreateGameButtonClick={this.props.onCreateGameButtonClick}
+								onGameClick={this.handleGameClick}
+								socket={this.props.socket}
+							/>:
+							<LeftSidebar
+								userInfo={this.props.userInfo}
+								midSection={this.props.midSection}
+								gameList={this.props.gameList}
+								onCreateGameButtonClick={this.props.onCreateGameButtonClick}
+								onGameClick={this.handleGameClick}
+								socket={this.props.socket}
+							/>;
 					}
 				})()}
 			</section>

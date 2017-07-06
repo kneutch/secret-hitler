@@ -1,0 +1,96 @@
+#main .moderation {
+		color: $fascistteam;
+		h2 {
+			text-align: center;
+		}
+		.player-list-toggle {
+			position: absolute;
+			color: lightblue;
+			text-decoration: underline;
+			right: 80px;
+			top: 70px;
+			cursor: pointer;
+		}
+		.remove.icon {
+			cursor: pointer;
+			position: absolute;
+			font-size: 30px;
+			left: 94%;
+			opacity: .3;
+			top: 70px;
+		}
+		ul {
+			list-style-type: none;
+			li label {
+				cursor: pointer;
+			}
+		}
+		button {
+			color: black;
+			padding: 10px;
+		}
+		> div {
+			display: flex;
+			.modlog {
+				max-width: 60%;
+				width: 100%;
+				> div {
+					max-height: 470px;
+  				overflow-y: scroll;
+				}
+			}
+			.modplayerlist {
+				ul {
+					padding: 0 0 0 10px;
+					max-height: 370px;
+					overflow-y: scroll;
+				}
+			}
+			> div {
+				padding: 0 5px;
+			}
+			h3 {
+				text-align: center;
+			}
+		}
+		.multi {
+			color: yellow;
+		}
+		table {
+			font-size: 12px;
+
+			td {
+				padding: 2px;
+			}
+			
+			tr {
+				background: lightyellow;
+			}
+		}
+		textarea {
+			width: 100%;
+		}
+		.ip {
+			color: orange;
+		}
+		.broadcast {
+			cursor: pointer;
+			position: absolute;
+			left: 5%;
+			top: 70px;
+			text-decoration: underline;
+		}
+		.ipban-button {
+			width: 100%;
+			background: darkred;
+			color: white;
+			margin: 5px 0;
+		}
+}
+
+.broadcastmodal {
+	display: none !important;
+	input {
+		width: 600px;
+	}
+}
