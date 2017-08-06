@@ -3,6 +3,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import $ from 'jquery';
 import {ADMINS} from '../../constants';
+import PropTypes from 'prop-types';
 
 export default class Moderation extends React.Component {
 	constructor() {
@@ -17,7 +18,8 @@ export default class Moderation extends React.Component {
 			actionTextValue: '',
 			log: [],
 			playerListShown: true,
-			broadcastText: ''
+			broadcastText: '',
+			playerInputText: ''
 		};
 	}
 
@@ -40,6 +42,18 @@ export default class Moderation extends React.Component {
 		this.setState({playerListShown: !this.state.playerListShown});
 	}
 
+	renderPlayerInput() {
+		const playerInputKeyup = e => {
+			this.setState({playerInputText: `${e.target.value}`});
+		};
+
+		return (
+			<div className="player-input">
+				<input placeholder="Player name" onChange={playerInputKeyup} className="player-input" value={this.state.playerInputText} />
+			</div>
+		);
+	}
+
 	renderUserlist() {
 		const radioChange = userName => {
 				this.setState({selectedUser: userName});
@@ -47,7 +61,7 @@ export default class Moderation extends React.Component {
 			{userList} = this.state,
 			ips = userList.map(user => user.ip),
 			multiIPs = _.uniq(_.filter(ips, (x, i, ips) => _.includes(ips, x, i + 1)));
-
+		console.log(userList)
 		return userList
 			.sort((a, b) => (() => {
 				if (a.isRainbow && !b.isRainbow) {
@@ -58,7 +72,7 @@ export default class Moderation extends React.Component {
 					return -1;
 				}
 
-				return b.userName - a.userName;
+				return a.ip - b.ip;
 			})())
 			.map((user, index) => <li key={index} className={multiIPs.includes(user.ip) ? 'multi' : ''}><label><input type="radio" name="users" onChange={() => {radioChange(user.userName);}} />{user.userName} <span className="ip">{user.ip}</span></label></li>);
 	}
@@ -67,14 +81,15 @@ export default class Moderation extends React.Component {
 		const takeModAction = action => {
 			this.props.socket.emit('updateModAction', {
 				modName: this.props.userInfo.userName,
-				userName: this.state.selectedUser,
+				userName: this.state.playerInputText || this.state.selectedUser,
 				ip: this.state.selectedUser ? this.state.userList.find(user => user.userName === this.state.selectedUser).ip : '',
 				comment: this.state.actionTextValue,
 				action
 			});
 			this.setState({
 				selectedUser: '',
-				actionTextValue: ''
+				actionTextValue: '',
+				playerInputText: ''
 			});
 			setTimeout(() => {
 				this.props.socket.emit('getModInfo');
@@ -84,9 +99,13 @@ export default class Moderation extends React.Component {
 		return (
 			<div className="button-container">
 				<button className={(!this.state.selectedUser || !this.state.actionTextValue) ? 'ui button primary disabled' : 'ui button primary'} onClick={() => {takeModAction('ban');}}>Ban user</button>
-				<button className={!this.state.actionTextValue ? 'ui button disabled' : 'ui button'} onClick={() => {takeModAction('comment');}}>Comment without action</button>
-				<button className={!this.state.actionTextValue ? 'ui button disabled ipban-button' : 'ui button ipban-button'} onClick={() => {takeModAction('ipban');}}>Ban and IP ban for 18 hours</button>
-				<button className={(!this.state.actionTextValue && ADMINS.includes(this.props.userInfo.userName)) ? 'ui button disabled ipban-button' : 'ui button ipban-button'} onClick={() => {takeModAction('ipbanlarge');}}>Ban and IP ban for 1 week</button>
+				<button className={(!this.state.actionTextValue || !this.state.playerInputText) ? 'ui button disabled' : 'ui button'} onClick={() => {takeModAction('comment');}}>Comment without action</button>
+				<br />
+				<button className={(!this.state.actionTextValue || !this.state.playerInputText) || !this.state.selectedUser ? 'ui button disabled tier3' : 'ui button tier3'} onClick={() => {takeModAction('deleteUser');}}>Delete user</button>
+				<button className={(!this.state.actionTextValue || !this.state.playerInputText) || !this.state.selectedUser ? 'ui button disabled tier3' : 'ui button tier3'} onClick={() => {takeModAction(`setWins${this.state.actionTextValue}`);}}>Set wins</button>
+				<button className={(!this.state.actionTextValue || !this.state.playerInputText) || !this.state.selectedUser ? 'ui button disabled tier3' : 'ui button tier3'} onClick={() => {takeModAction(`setLosses${this.state.actionTextValue}`);}}>Set losses</button>
+				<button className={(!this.state.actionTextValue || !this.state.playerInputText) || !this.state.selectedUser ? 'ui button disabled ipban-button' : 'ui button ipban-button'} onClick={() => {takeModAction('ipban');}}>Ban and IP ban for 18 hours</button>
+				<button className={((!this.state.actionTextValue || !this.state.playerInputText) || !ADMINS.includes(this.props.userInfo.userName) || !this.state.selectedUser) ? 'ui button disabled ipban-button' : 'ui button ipban-button'} onClick={() => {takeModAction('ipbanlarge');}}>Ban and IP ban for 1 week</button>
 			</div>
 		);
 	}
@@ -168,6 +187,9 @@ export default class Moderation extends React.Component {
 									<ul className="userlist">
 										{this.renderUserlist()}
 									</ul>
+									<div className="ui horizontal divider">or</div>
+									{this.renderPlayerInput()}
+									<div className="ui horizontal divider">-</div>
 									{this.renderActionText()}
 									{this.renderButtons()}
 								</div>
@@ -198,7 +220,7 @@ export default class Moderation extends React.Component {
 }
 
 Moderation.propTypes = {
-	userInfo: React.PropTypes.object,
-	socket: React.PropTypes.object,
-	onLeaveModeration: React.PropTypes.func
+	userInfo: PropTypes.object,
+	socket: PropTypes.object,
+	onLeaveModeration: PropTypes.func
 };

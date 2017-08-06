@@ -1,6 +1,7 @@
 const passport = require('passport'),
 	_ = require('lodash'),
 	Account = require('../models/account'),
+	// BannedIP = require('../models/bannedIP'),
 	BannedIP = require('../models/BannedIP'),
 	blacklistedWords = require('../iso/blacklistwords'),
 	ensureAuthenticated = (req, res, next) => {

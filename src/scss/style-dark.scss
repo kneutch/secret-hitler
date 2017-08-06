@@ -26,7 +26,11 @@ $dteal: #034f61;
 @import 'profile.scss';
 @import 'moderation.scss';
 #main {
+<<<<<<< HEAD
 //width: 1253px;
+=======
+    min-width: 1284px;
+>>>>>>> upstream/master
     margin-left: auto;
     margin-right: auto;
     max-width: inherit !important;
@@ -100,6 +104,19 @@ $dteal: #034f61;
         background-repeat: no-repeat !important;
         background-color: none;
     }
+    .section-left {
+      width: 240px !important;
+    }
+    .section-main {
+      width: 800px !important;
+		}
+		.section-main.ingame {
+			width: 100% !important;
+		}
+    .section-right {
+			flex-grow: 1;
+			min-width: 241px;
+    }
     .playerlist {
         background: #202020;
     }
@@ -133,7 +150,8 @@ $dteal: #034f61;
     }
     .game>.ui.grid .chat-container .gamechat .chats,
     .game-chat {
-        background: #3d3d3d;
+				background: #3d3d3d;
+				flex-grow: 1;
     }
     .game>.ui.grid .chat-container .gamechat .inputbar .expando-container .hotkey-container {
         background: #7c7c7c;
@@ -296,17 +314,17 @@ body {
         padding-bottom: 0;
     }
     >.ui.grid {
-        border-top: 1px solid #ddd;
+				border-top: 1px solid #ddd;
     }
 }
 
 .changelog {
-	max-height: 554px;
-	overflow-y: scroll;
+    max-height: 554px;
+    overflow-y: scroll;
 }
 
 .section-main>.menu {
-    margin: 0;
+    margin: -0.5rem;
 }
 
 .header-container {
@@ -330,48 +348,28 @@ body {
     margin-left: -237px;
 }
 
-.experienced {
-    color: #b3eab3 !important;
+@for $i from 1 through 5 {
+    .experienced#{$i} {
+        color: rgb(19, (222 - ($i * 20)), 19) !important;
+    }
 }
 
-.veryexperienced {
-    color: #7cd17c !important;
+@for $i from 1 through 10 {
+    .onfire#{$i} {
+        color: rgb(183, (10 - $i) * 15, 167) !important;
+    }
 }
 
-.veryveryexperienced {
-    color: #48d348 !important;
-}
-
-.superexperienced {
-    color: #11c811 !important;
-}
-
-.supersuperexperienced {
-    color: #00a100;
-}
-
-.sortaonfire {
-    color: #d9aade !important;
-}
-
-.onfire {
-    color: #da65e5 !important;
-}
-
-.veryonfire {
-    color: #b703a7 !important;
-}
-
-.natekiller {
-	color: #FFFF00 !important;
+.moderatorcolor {
+	color:  #0F43FC !important;
 }
 
 .admin {
-	color: red !important;
+    color: red !important;
 }
 
 .contributer {
-	color: orange !important;
+    color: orange !important;
 }
 
 
@@ -451,6 +449,17 @@ body {
 
 .moderator-name {
     color: red;
+}
+
+.modal-warning {
+		color: coral;
+		padding: 5px 20px;
+		font-size: 16px;
+}
+
+#main .thirteen.wide.section-main.ingame {
+	flex-grow: 1;
+	width: initial !important;
 }
 
 ::-webkit-scrollbar {

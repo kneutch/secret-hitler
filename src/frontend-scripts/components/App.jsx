@@ -5,8 +5,12 @@ import Main from './section-main/Main.jsx';
 import RightSidebar from './section-right/RightSidebar.jsx';
 import { updateUser, updateMidsection, updateGameList, updateGameInfo, updateUserList, updateGeneralChats, updateVersion } from '../actions/actions.js';
 import socket from '../socket';
+<<<<<<< HEAD
 require('onsenui'); // This needs to be imported to bootstrap the components.
 var Ons = require('react-onsenui');
+=======
+import PropTypes from 'prop-types';
+>>>>>>> upstream/master
 
 const select = state => state;
 
@@ -170,6 +174,7 @@ export class App extends React.Component {
 					name: 'New Game',
 					minPlayersCount: 5,
 					maxPlayersCount: 5,
+					excludedPlayerCount: [6],
 					private: false,
 					rainbowgame: true,
 					experiencedMode: true,
@@ -304,8 +309,43 @@ export class App extends React.Component {
 							<Main
 								userInfo={this.props.userInfo}
 								midSection={this.props.midSection}
+<<<<<<< HEAD
 								onCreateGameSubmit={this.handleCreateGameSubmit}
 								onLeaveCreateGame={this.handleRoute}
+=======
+								gameList={this.props.gameList}
+								onCreateGameButtonClick={this.handleRoute}
+								onGameClick={this.handleGameClick}
+								socket={socket}
+							/>
+						);
+					}
+				})()}
+				<Main
+					userInfo={this.props.userInfo}
+					midSection={this.props.midSection}
+					onCreateGameSubmit={this.handleCreateGameSubmit}
+					onLeaveCreateGame={this.handleRoute}
+					gameInfo={this.props.gameInfo}
+					onLeaveSettings={this.handleRoute}
+					onSeatingUser={this.handleSeatingUser}
+					onLeaveGame={this.handleLeaveGame}
+					quickDefault={this.makeQuickDefault}
+					onLeaveChangelog={this.handleRoute}
+					onSettingsButtonClick={this.handleRoute}
+					onChangelogButtonClick={this.handleRoute}
+					onLeaveModeration={this.handleRoute}
+					onClickedTakeSeat={this.handleSeatingUser}
+					userList={this.props.userList}
+					socket={socket}
+					version={this.props.version}
+				/>
+				{(() => {
+					if (this.props.midSection !== 'game' && this.props.midSection !== 'replay'
+						|| this.props.userInfo.gameSettings && this.props.userInfo.gameSettings.enableRightSidebarInGame) {
+						return (
+							<RightSidebar
+>>>>>>> upstream/master
 								gameInfo={this.props.gameInfo}
 								gameList= {this.props.gameList}
 								onLeaveSettings={this.handleRoute}
@@ -334,13 +374,13 @@ export class App extends React.Component {
 }
 
 App.propTypes = {
-	dispatch: React.PropTypes.func,
-	userInfo: React.PropTypes.object,
-	midSection: React.PropTypes.string,
-	gameInfo: React.PropTypes.object,
-	gameList: React.PropTypes.array,
-	generalChats: React.PropTypes.array,
-	userList: React.PropTypes.object
+	dispatch: PropTypes.func,
+	userInfo: PropTypes.object,
+	midSection: PropTypes.string,
+	gameInfo: PropTypes.object,
+	gameList: PropTypes.array,
+	generalChats: PropTypes.array,
+	userList: PropTypes.object
 };
 
 export default connect(select)(App);

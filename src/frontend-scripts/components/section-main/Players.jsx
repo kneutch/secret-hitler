@@ -2,6 +2,7 @@ import React from 'react';
 import $ from 'jquery';
 import Policies from './Policies.jsx';
 import {PLAYERCOLORS} from '../../constants';
+import PropTypes from 'prop-types';
 
 export default class Players extends React.Component {
 	constructor() {
@@ -85,8 +86,8 @@ export default class Players extends React.Component {
 		const {gameInfo, userInfo} = this.props,
 			{playersState, gameState, publicPlayersState} = gameInfo;
 
-		return publicPlayersState.map((player, i) => {
-			return (
+		return publicPlayersState.map((player, i) =>
+			(
 				<div key={i}
 					data-index={i}
 					onClick={this.handlePlayerClick}
@@ -116,9 +117,7 @@ export default class Players extends React.Component {
 						(() => {
 							let classes = 'player-number';
 
-							if (userInfo.userName && publicPlayersState.findIndex(player => player.userName === userInfo.userName) === i) {
-								classes = `${classes} seated-user`;
-							} else if (playersState && Object.keys(playersState).length && playersState[i] && playersState[i].nameStatus) {
+							if (playersState && Object.keys(playersState).length && playersState[i] && playersState[i].nameStatus) {
 								classes = `${classes} ${playersState[i].nameStatus}`;
 							} else if (Object.keys(publicPlayersState).length && publicPlayersState[i].nameStatus) {
 								classes = `${classes} ${publicPlayersState[i].nameStatus}`;
@@ -186,8 +185,7 @@ export default class Players extends React.Component {
 						} />
 					</div>
 				</div>
-			);
-		});
+			));
 	}
 
 	renderTakeSeat() {
@@ -264,10 +262,10 @@ export default class Players extends React.Component {
 }
 
 Players.propTypes = {
-	roles: React.PropTypes.array,
-	userInfo: React.PropTypes.object,
-	gameInfo: React.PropTypes.object,
-	roleState: React.PropTypes.string,
-	userList: React.PropTypes.object,
-	selectedGamerole: React.PropTypes.func
+	roles: PropTypes.array,
+	userInfo: PropTypes.object,
+	gameInfo: PropTypes.object,
+	roleState: PropTypes.string,
+	userList: PropTypes.object,
+	selectedGamerole: PropTypes.func
 };

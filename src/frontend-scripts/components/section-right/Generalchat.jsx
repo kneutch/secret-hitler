@@ -1,6 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 import {MODERATORS} from '../../constants';
+import PropTypes from 'prop-types';
 
 export default class Generalchat extends React.Component {
 	constructor() {
@@ -36,7 +37,7 @@ export default class Generalchat extends React.Component {
 		const {inputValue} = this.state;
 
 		e.preventDefault();
-		if (inputValue) {
+		if (inputValue.length < 300) {
 			this.props.socket.emit('addNewGeneralChat', {
 				userName: this.props.userInfo.userName,
 				chat: inputValue
@@ -111,7 +112,7 @@ export default class Generalchat extends React.Component {
 						}}/>
 						<button className={this.state.inputValue ? 'ui primary button' : 'ui primary button disabled'}>Chat</button>
 					</div>
-					<i className={this.state.inputValue ? 'large delete icon' : 'large delete icon app-hidden'} onClick={this.handleChatClearClick} />
+					<i className={this.state.inputValue ? 'large delete icon' : 'large delete icon app-visibility-hidden'} onClick={this.handleChatClearClick} />
 				</form>
 			</section>
 		);
@@ -119,9 +120,9 @@ export default class Generalchat extends React.Component {
 }
 
 Generalchat.propTypes = {
-	gameInfo: React.PropTypes.object,
-	userInfo: React.PropTypes.object,
-	socket: React.PropTypes.object,
-	generalChats: React.PropTypes.array,
-	userList: React.PropTypes.object
+	gameInfo: PropTypes.object,
+	userInfo: PropTypes.object,
+	socket: PropTypes.object,
+	generalChats: PropTypes.array,
+	userList: PropTypes.object
 };
