@@ -37,7 +37,7 @@ export default class Generalchat extends React.Component {
 		const {inputValue} = this.state;
 
 		e.preventDefault();
-		if (inputValue) {
+		if (inputValue.length < 300) {
 			this.props.socket.emit('addNewGeneralChat', {
 				userName: this.props.userInfo.userName,
 				chat: inputValue
@@ -112,7 +112,7 @@ export default class Generalchat extends React.Component {
 						}}/>
 						<button className={this.state.inputValue ? 'ui primary button' : 'ui primary button disabled'}>Chat</button>
 					</div>
-					<i className={this.state.inputValue ? 'large delete icon' : 'large delete icon app-hidden'} onClick={this.handleChatClearClick} />
+					<i className={this.state.inputValue ? 'large delete icon' : 'large delete icon app-visibility-hidden'} onClick={this.handleChatClearClick} />
 				</form>
 			</section>
 		);

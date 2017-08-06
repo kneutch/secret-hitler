@@ -5,6 +5,7 @@ const {games, userList, generalChats} = require('./models'),
 	Account = require('../../models/account'),
 	Generalchats = require('../../models/generalchats'),
 	ModAction = require('../../models/modAction'),
+	// BannedIP = require('../../models/bannedIP'),
 	BannedIP = require('../../models/BannedIP'),
 	startGame = require('./game/start-game.js'),
 	{secureGame} = require('./util.js'),
@@ -62,9 +63,10 @@ module.exports.updateSeatedUser = (socket, data) => {
 
 	if (game
 	&& game.publicPlayersState.length < game.general.maxPlayersCount
-		&& !game.publicPlayersState.find(player => player.userName === data.userName)
+	&& !game.publicPlayersState.find(player => player.userName === data.userName)
 	&& (!game.general.private || (game.general.private && data.password === game.private.privatePassword || game.general.private && game.general.whitelistedPlayers.includes(data.userName)))) {
 		const {publicPlayersState} = game;
+		let countDown;
 
 		publicPlayersState.push({
 			userName: data.userName,
@@ -83,12 +85,21 @@ module.exports.updateSeatedUser = (socket, data) => {
 		if (publicPlayersState.length === game.general.maxPlayersCount && !game.gameState.isStarted) { // sloppy but not trivial to get around
 			game.gameState.isStarted = true;
 			startGame(game);
-		} else if (publicPlayersState.length === game.general.minPlayersCount) {
+		} else if (game.general.excludedPlayerCount.includes(publicPlayersState.length)) {
+			clearInterval(countDown);
+			game.gameState.cancellStart = true;
+			game.general.status = 'Waiting for more players..';
+		} else if (publicPlayersState.length === game.general.minPlayersCount
+			|| (publicPlayersState.length > game.general.minPlayersCount && !game.general.excludedPlayerCount.includes(publicPlayersState.length) && !game.gameState.isStarted)) {
 			let startGamePause = 20;
 
 			game.gameState.isStarted = true;
-			const countDown = setInterval(() => {
-				if (startGamePause === 4) {
+			countDown = setInterval(() => {
+				if (game.gameState.cancellStart) {
+					game.gameState.cancellStart = false;
+					game.gameState.isStarted = false;
+					clearInterval(countDown);
+				} else if (startGamePause === 4) {
 					clearInterval(countDown);
 					startGame(game);
 				} else {
@@ -104,9 +115,7 @@ module.exports.updateSeatedUser = (socket, data) => {
 		}
 
 		updateUserStatus(data.userName, game.general.rainbowgame ? 'rainbow' : 'playing', data.uid);
-
 		io.sockets.in(data.uid).emit('gameUpdate', secureGame(game));
-
 		sendGameList();
 	}
 };
@@ -405,7 +414,7 @@ module.exports.handleAddNewClaim = (data) => {
 module.exports.handleAddNewGameChat = (socket, data) => {
 	const { passport } = socket.handshake.session;
 
-	if (!passport || !passport.user || passport.user !== data.userName) {
+	if (!passport || !passport.user || passport.user !== data.userName || data.chat.length > 300) {
 		return;
 	}
 
@@ -438,7 +447,7 @@ module.exports.handleNewGeneralChat = (socket, data) => {
 
 	// Check that they are who they say they are.  Should this do, uh, whatever
 	// the ws equivalent of a 401 unauth is?
-	if (!passport || !passport.user || passport.user !== data.userName) {
+	if (!passport || !passport.user || passport.user !== data.userName || data.chat.length > 300) {
 		return;
 	}
 
@@ -485,7 +494,7 @@ module.exports.handleUpdatedGameSettings = (socket, data) => {
 module.exports.handleModerationAction = (socket, data) => {
 	const {passport} = socket.handshake.session,
 		affectedSocketId = Object.keys(io.sockets.sockets).find(socketId => io.sockets.sockets[socketId].handshake.session.passport && io.sockets.sockets[socketId].handshake.session.passport.user === data.userName);
-
+	console.log(data, 'data');
 	if (passport && (MODERATORS.includes(passport.user) || ADMINS.includes(passport.user))) {
 		const modaction = new ModAction({
 				date: new Date(),
@@ -510,19 +519,26 @@ module.exports.handleModerationAction = (socket, data) => {
 
 		modaction.save();
 		switch (data.action) {
+		case 'deleteUser':
+			Account.findOne({username: data.userName}).remove(() => {
+				if (io.sockets.sockets[affectedSocketId]) {
+					io.sockets.sockets[affectedSocketId].emit('manualDisconnection');
+				}
+			});
+			break;
 		case 'ban':
 			banAccount(data.userName);
 			break;
 		case 'broadcast':
 			games.forEach(game => {
 				game.chats.push({
-					chat: data.comment,
+					chat: `(${data.modName}) ${data.comment}`,
 					isBroadcast: true,
 					timestamp: new Date()
 				});
 			});
 			generalChats.push({
-				userName: 'BROADCAST',
+				userName: `BROADCAST (${data.modName})`,
 				time: new Date(),
 				chat: data.comment,
 				isBroadcast: true
@@ -549,6 +565,17 @@ module.exports.handleModerationAction = (socket, data) => {
 			banAccount(data.userName);
 			ipbanl.save();
 			break;
+		default:
+			const setType = /setWins/.test(data.action) ? 'wins' : 'losses',
+				number = setType === 'wins' ? parseInt(data.action.substr(7)) : parseInt(data.action.substr(9));
+
+			if (!isNaN(number)) {
+				Account.findOne({username: data.userName})
+					.then(account => {
+						account[setType] = number;
+						account.save();
+					});
+			}
 		}
 	}
 };

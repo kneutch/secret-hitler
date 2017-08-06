@@ -1,6 +1,10 @@
 .settings {
-
 	padding: 2%;
+
+	.popups button {
+		margin-top: 20px;
+		color: #fff;
+	}
 
 	.remove.icon {
 		cursor: pointer;
@@ -11,13 +15,49 @@
 	}
 
 	.cardback-container {
+		// display: none !important;
 		text-align: center;
+
+		> .ui.grid {
+			width: 100%;
+		}
+
+		.cardbacks-container {
+			justify-content: space-around;
+		}
 
 		.current-cardback {
 			width: 70px;
 			height: 95px;
 			background: url('../images/tweed.png')
 		}
+<<<<<<< HEAD
+=======
+		.dropzone {
+			width: 70px;
+			height: 95px;
+			border-width: 2px;
+			border-color: rgb(102, 102, 102);
+			border-style: dashed;
+			border-radius: 5px;
+			color: #ddd;
+		}
+
+		.preview-container {
+			button {
+				position: relative;
+				color: #ddd;
+				top: -60px;
+				left: 10px;
+			}
+
+			a {
+				position: relative;
+				top: -10px;
+				left: -48px;
+			}
+		}
+>>>>>>> 64f238291c7137bbd81baaaaf165d14891a61ef8
 	}
 
 	.ui.header {

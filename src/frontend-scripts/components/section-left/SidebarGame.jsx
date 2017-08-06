@@ -19,7 +19,36 @@ const SidebarGame = props => {
 
 			return classes;
 		},
-		playersCount = () => game.minPlayersCount === game.maxPlayersCount ? `${game.minPlayersCount} players` : `${game.minPlayersCount} - ${game.maxPlayersCount} players`;
+		playersCount = () => {
+			const availableSeatCounts = new Array(game.maxPlayersCount)
+				.fill(true)
+				.map((el, i) => (game.excludedPlayerCount.includes(i + 1) || i + 1 < game.minPlayersCount) ? false : i + 1)
+				.filter(el => el);
+
+			let str = '';
+
+			availableSeatCounts.forEach(el => {
+				if (availableSeatCounts.includes(el)) {
+					if (el === game.maxPlayersCount) {
+						str = `${str}${el} players`;
+					} else {
+						if (availableSeatCounts.includes(el - 1)) {
+							if (!availableSeatCounts.includes(el + 1)) {
+								str = `${str}${el}, `;
+							}
+						} else {
+							if (!str.length) {
+								str = availableSeatCounts.includes(el + 1) ? `${el}-` : `${el},`;
+							} else {
+								str = !availableSeatCounts.includes(el + 1) ? `${str}${el},` : str = `${str}${el}-`;
+							}
+						}
+					}
+				}
+			});
+
+			return str;
+		};
 
 	return (
 		<div data-uid={game.uid} onClick={() => {props.socket.emit('getGameInfo', game.uid);}} className={gameClasses()}>
@@ -59,8 +88,8 @@ const SidebarGame = props => {
 							})()}
 							<div className="lower-row">
 								<span className="allowed-players">{playersCount()} </span>
-								<span className="divider">|</span>
-								<span className="seatedcount"> {game.seatedCount} {game.seatedCount === 1 ? 'player' : 'players'} seated</span>
+								<span className="divider" style={{color: '#ddd'}}>|</span>
+								<span className="seatedcount"> {game.seatedCount} {game.seatedCount === 1 ? 'player' : 'players'}</span>
 							</div>
 						</div>
 					) :

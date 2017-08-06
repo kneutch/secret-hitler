@@ -20,7 +20,8 @@ export default class Creategame extends React.Component {
 			disablegamechat: false,
 			privateShowing: false,
 			containsBadWord: false,
-			rainbowgame: false
+			rainbowgame: false,
+			checkedSliderValues: new Array(6).fill(true)
 		};
 	}
 
@@ -73,8 +74,20 @@ export default class Creategame extends React.Component {
 		});
 	}
 
-	sliderChange(event) {
-		this.setState({sliderValues: event});
+	sliderChange(sliderValues) {
+		const {checkedSliderValues} = this.state;
+		// todo make this uncheck boxes instead of just check
+		// event.forEach(el => {
+		// 	if (!this.state.checkedSliderValues[el - 5]) {
+		// 		newState.checkedSliderValues = this.state.checkedSliderValues;
+		// 		newState.checkedSliderValues[el - 5] = true;
+		// 	}
+		// });
+
+		this.setState({
+			sliderValues,
+			checkedSliderValues: new Array(6).fill(true).map((el, index) => index + 5 >= sliderValues[0] && index + 5 <= sliderValues[1] && checkedSliderValues[index] || index + 5 === sliderValues[0] || index + 5 === sliderValues[1])
+		});
 	}
 
 	leaveCreateGame() {
@@ -107,10 +120,12 @@ export default class Creategame extends React.Component {
 				},
 				chats: [],
 				general: {
+					enabledPlayerCounts: this.state.checkedSliderValues.filter(el => el).map((el, i) => i + 5),
 					whitelistedPlayers: [],
 					uid: Math.random().toString(36).substring(6),
 					name: $creategame.find('div.gamename input').val() || 'New Game',
 					minPlayersCount: this.state.sliderValues[0],
+					excludedPlayerCount: this.state.checkedSliderValues.map((el, index) => el ? null : index + 5).filter(el => el),
 					maxPlayersCount: this.state.sliderValues[1],
 					status: `Waiting for ${this.state.sliderValues[0] - 1} more players..`,
 					experiencedMode: this.state.experiencedmode,
@@ -143,6 +158,14 @@ export default class Creategame extends React.Component {
 	}
 
 	render() {
+		const sliderCheckboxClick = index => {
+			if (!this.state.sliderValues.includes(index + 5)) {
+				this.setState({
+					checkedSliderValues: this.state.checkedSliderValues.map((el, i) => i === index ? !el : el)
+				});
+			}
+		};
+
 		return (
 			<section className="creategame">
 				<i className="remove icon" onClick={this.leaveCreateGame} />
@@ -167,6 +190,14 @@ export default class Creategame extends React.Component {
 						<div className="eight wide column slider">
 							<h4 className="ui header">Number of players</h4>
 							<Slider onChange={this.sliderChange} min={5} max={10} range defaultValue={[5, 10]} marks={{5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10'}} />
+							<div className="checkbox-container">
+								{new Array(6).fill(true).map((el, index) => (
+									<label key={index}>
+										<input type="checkbox" checked={this.state.checkedSliderValues[index]} disabled={index + 5 <= this.state.sliderValues[0] || index + 5 >= this.state.sliderValues[1]} onChange={() => {sliderCheckboxClick(index);}}/>
+									</label>
+									)
+								)}
+							</div>
 						</div>
 						<div className="four wide column privategame">
 							<h4 className="ui header">Private game</h4>
@@ -190,7 +221,7 @@ export default class Creategame extends React.Component {
 					</div>
 					<div className="row sliderrow">
 						<div className="four wide column experiencedmode">
-							<h4 className="ui header">Experienced mode - most animations and pauses greatly reduced and fewer gamechats</h4>
+							<h4 className="ui header">Speed mode - most animations and pauses greatly reduced and fewer gamechats</h4>
 							<div className="ui fitted toggle checkbox" ref={c => {
 								this.experiencedmode = c;
 							}}>

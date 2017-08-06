@@ -9,18 +9,38 @@ const Changelog = props =>
 				<h2>Changelog</h2>
 			</div>
 			<div className="ui header">
-				<p>Version 0.6.4 "dry brush" released 7-9-2017</p>
+				<p>Version 0.6.6 "tuotuc" released 8-2-2017</p>
 			</div>
-			<h3>New feature: player color refactoring.</h3>
-			<p>Player colors have been changed in two ways: they are fixed by math as opposed to me randomly clicking colors, and there are many more shades (10) that change every 2% points for purples.  Also, purple starts at 52% as opposed to 55% (and highest tier is >70%, fyi). Check the "!" icon next to the lobby.</p>
-			<h3>New feature: player color on card in game.</h3>
+			<h3>Small patch to fix a bug that could be used to crash the server thanks to player veggiemanz who now has a shiny orange name.  Also these things:</h3>
+			<ul>
+				<li>Shuffling of the deck when its less than 3 should now happen before any election, as per the rules.  This will prevent the "nein all" problem when there's few policies left.</li>
+				<li>As you probably saw, there is a notice on the sign in/sign up modals to use Chrome or Firefox for the best experience.</li>
+				<li>Fascists who investigate hitler will not have hitler's name change to fascist color.</li>
+				<li>Hid the cardback section on settings as that is work in progress.</li>
+				<li>Gamelist sort should be better and no longer bounce around as much.</li>
+				<li>Confetti should no longer prevent the winners from being able to type in chat while its raining down.</li>
+				<li>A fix to chancellor discards not showing up in replays.</li>
+			</ul>
+			<div className="ui header">
+				<p>Version 0.6.5 "cutout" released 7-30-2017</p>
+			</div>
+			<h3>New feature: creategame player count exclusions.</h3>
+			<div style={{textAlign: 'center'}}>
+				<img src="images/excludeplayers.png" style={{width: '50%'}}/>
+			</div>
+			<p>In the create game view, players now have the option to uncheck player counts from starting the game.  For example, if you really hated 7 player games but liked playing 5-10 player games, your new game would not start if there are 7 seated players. Hitting that threshold will cause your 20 second timer to restart, but that's unavoidable.</p>
+			<div style={{textAlign: 'center'}}>
+				<img src="images/no79.png" style={{width: '50%'}}/>
+			</div>
 			<p>Other issues:</p>
 			<ul>
-				<li>There is one crash bug left that has happened once in the past 10 days and hopefully I've prevented it permanetly in this patch.</li>
-				<li>Some fixes to bugs in replays, and replays now have vetos.</li>
-				<li>The rules page for this site has been adjusted to account for online vs physical play.</li>
-				<li>Private games now have a new symbol in the gamelist as opposed to green text.</li>
+				<li>Your name in-game is no longer green - it is the color of your dealt role.  Somehow people were forgetting they're hitler..</li>
+				<li>Moderators have a new color.</li>
+				<li>Thanks to a contribution, track images have been redone from the original files and colored, unlike my crappy scans.</li>
+				<li>Bug fix: player replays are back.</li>
+				<li>Bug fix: green players are not all the same color green (based on played games).</li>
 			</ul>
+			<p>Next up: player uploaded cardback images!  Fun.  No nazi stuff please..</p>
 			<div className="ui header">
 				<p>Version 0.6.0 "noise" released 6-12-2017</p>
 			</div>
