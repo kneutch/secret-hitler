@@ -33,6 +33,7 @@ module.exports.sendUserGameSettings = (socket, username) => {
 			if (!userListNames.includes(username)) {
 				userList.push({
 					userName: username,
+					avatar: account.avatar,
 					wins: account.wins,
 					losses: account.losses,
 					rainbowWins: account.rainbowWins,

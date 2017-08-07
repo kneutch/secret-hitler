@@ -8,6 +8,7 @@ const mongoose = require('mongoose'),
 			unique: true
 		},
 		password: String,
+		avatar:String,
 		gameSettings: {
 			customCardback: Boolean,
 			enableTimestamps: Boolean,

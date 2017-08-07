@@ -25,7 +25,7 @@ app.get('/auth/twitter', passport.authenticate('twitter'));
 	app.get('/auth/twitter/callback',
 		passport.authenticate('twitter', { failureRedirect: '/observe' }),
 		function (req, res) {
-			console.log(req);
+			//console.log(req);
 			res.redirect('/game');
 		});
 

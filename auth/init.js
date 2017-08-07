@@ -54,9 +54,11 @@ module.exports.authTwitter = function (token, tokenSecret, profile, done) {
     var searchQuery = {
       username: profile.username
     };
+		console.log(profile);
 
     var NewUser = new Account({
 				username : profile.username,
+				avatar : profile._json.profile_image_url_https,
 				gameSettings: {
 					disablePopups: false,
 					enableTimestamps: false,
@@ -78,7 +80,7 @@ module.exports.authTwitter = function (token, tokenSecret, profile, done) {
 				signupIP: '127.0.0.1'
 			});
 
-
+console.log(NewUser);
     // update the user if s/he exists or add a new user
   	Account.findOne(searchQuery,
 	 	function (err, user) {

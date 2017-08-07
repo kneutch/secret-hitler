@@ -1,12 +1,9 @@
 import React from 'react';
 import $ from 'jquery';
 import {PLAYERCOLORS, MODERATORS} from '../../constants';
-<<<<<<< HEAD
-=======
 import { loadReplay } from '../../actions/actions';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
->>>>>>> upstream/master
 
 var chatScroll =0;
 
@@ -90,12 +87,7 @@ export default class Gamechat extends React.Component {
 		const currentValue = this.state.inputValue,
 			{gameInfo, userInfo} = this.props;
 		e.preventDefault();
-<<<<<<< HEAD
 		if (currentValue.length) {
-=======
-
-		if (currentValue.length < 300) {
->>>>>>> upstream/master
 			const chat = {
 				userName: userInfo.userName,
 				chat: currentValue,
@@ -452,13 +444,8 @@ export default class Gamechat extends React.Component {
 					>
 						<input value={this.state.inputValue} onChange={this.handleInputChange} maxLength="300" autoComplete="off" spellCheck="false" placeholder="Chat.." id="gameChatInput" ref={c => {
 							this.gameChatInput = c;
-<<<<<<< HEAD
 						}} onChange={this.handleInputChange} maxLength="300" />
 						<button onClick={this.handleSubmit} className={this.state.inputValue.length ? 'ui primary button' : 'ui primary button disabled'}>Chat</button>
-=======
-						}}/>
-						<button className={this.state.inputValue.length ? 'ui primary button' : 'ui primary button disabled'}>Chat</button>
->>>>>>> upstream/master
 					</div>
 					{(() => {
 						if (gameInfo.playersState.length && userInfo.userName && gameInfo.playersState[gameInfo.publicPlayersState.findIndex(player => player.userName === userInfo.userName)].claim) {
@@ -501,7 +488,6 @@ export default class Gamechat extends React.Component {
 }
 
 Gamechat.propTypes = {
-<<<<<<< HEAD
 	onNewGameChat: React.PropTypes.func,
 	clickedGameRole: React.PropTypes.object,
 	clickedPlayer: React.PropTypes.object,
@@ -513,21 +499,3 @@ Gamechat.propTypes = {
 	socket: React.PropTypes.object,
 	userList: React.PropTypes.object
 };
-=======
-	onNewGameChat: PropTypes.func,
-	clickedGameRole: PropTypes.object,
-	clickedPlayer: PropTypes.object,
-	roleState: PropTypes.func,
-	selectedGamerole: PropTypes.object,
-	selectedPlayer: PropTypes.object,
-	userInfo: PropTypes.object,
-	gameInfo: PropTypes.object,
-	socket: PropTypes.object,
-	userList: PropTypes.object
-};
-
-export default connect(
-	null,
-	mapDispatchToProps
-)(Gamechat);
->>>>>>> upstream/master

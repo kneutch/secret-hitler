@@ -26,7 +26,7 @@ module.exports = () => {
 	app.get('/auth/twitter/callback',
 		passportTwitter.authenticate('twitter', { failureRedirect: '/observe' }),
 		function (req, res) {
-			console.log(req);
+			//console.log(req);
 			res.redirect('/game');
 		});
 

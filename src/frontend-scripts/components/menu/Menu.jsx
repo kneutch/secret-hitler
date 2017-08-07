@@ -200,3 +200,4 @@ Menu.propTypes = {
 	onLeaveGame: PropTypes.func,
 	onSettingsButtonClick: PropTypes.func
 };
+ 
